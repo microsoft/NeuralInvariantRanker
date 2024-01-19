@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function install_deps() {
-    pip install openai;
+    pip install openai==0.28.1;
     pip install tiktoken;
     pip install z3;
     pip install z3-solver;
