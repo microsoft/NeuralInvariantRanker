@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 from typing import Any, Callable, Dict, List, Optional, Tuple
 import os
 import sys

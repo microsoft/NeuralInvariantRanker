@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 from transformers.training_args import TrainingArguments
 import os
 import sys

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 if [[ $# -lt 2 ]]; then
     echo "Usage: $0 <codex-model-name[ada, babbage, curie, davinci, ada_002]> <fold> [max_positive] [max_negative] [alpha]"
     exit 1

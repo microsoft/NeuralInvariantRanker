@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 import os
 import sys
 from typing import Dict
@@ -53,8 +56,6 @@ if __name__ == '__main__':
     )
     logger.info(config)
     project_dir = os.path.abspath(os.path.join(__file__, "../.."))
-    # problems_directory = os.path.join(
-        # project_dir, "data/problems/lig-solved")
     problems_directory = config.input_dir
     problems_locations = {
         f[:-3]: os.path.join(root, f) for (root, dirs, files) in

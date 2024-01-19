@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 import copy
 from dataclasses import dataclass
 from torch.utils.data import Dataset as TorchDS
