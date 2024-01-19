@@ -15,7 +15,7 @@ im=$1;
 fold=$2;
 mp=${3:-"2"};
 mn=${4:-"2"};
-alpha=${5:-"1"};
+alpha=${5:-"0"};
 
 name="${im}/mp-${mp}_mn-${mn}_alpha-${alpha}/fold_${fold}"; 
 
@@ -61,6 +61,4 @@ python $BASE_DIR/src/ranker/main.py \
     --max_negative_examples ${mn} \
     --alpha ${alpha} \
     --do_train \
-    --do_rank \
-    --rank_result_path ${OUTPUT_DIR}/ranking_reports \
     --data_cache_path ${OUTPUT_DIR}/data_cache 2>&1| tee ${LOG_DIR}/train_and_evaluate.log;

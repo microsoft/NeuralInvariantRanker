@@ -20,15 +20,10 @@ if True:
         os.path.join(os.path.abspath(__file__), "../../.."))
     if project_dir not in sys.path:
         sys.path.append(project_dir)
-    from src.ranker.codebert.data import (
-        CrossDataSetForCodeBERT,
-        CrossLangSearchDataCollatorforCodeBERT
-    )
     from src.ranker.codex.data import (
         CrossDataSetForCodex,
         CrossLangSearchDataCollatorforCodex
     )
-    from src.ranker.codebert.models import CodeBERTBasedModel
     from src.ranker.codex.models import (
         CodexBasedModel, CodexBasedClassificationModel
     )
@@ -73,9 +68,6 @@ def parse_command_line_args():
     parser.add_argument(
         "--initial_model",
         type=str,
-        # choices from 
-        # ['codebert', 'roberta', 'graphcodeber', 'codex', 'unixcoder']
-        # or any other RoBERTa based model name
         default='codebert'
     )
     parser.add_argument(
@@ -215,28 +207,7 @@ if __name__ == '__main__':
                 "cached_embeddings"
             ] = cached_embeddings
     else:
-        if args.initial_model == 'codebert':
-            tokenizer_name = "microsoft/codebert-base"
-        elif args.initial_model == 'graphcodebert':
-            tokenizer_name = "microsoft/graphcodebert-base"
-        elif args.initial_model == 'unixcoder':
-            tokenizer_name = "microsoft/unixcoder-base"
-        elif '/' in args.initial_model:
-            tokenizer_name = args.initial_model
-        else:
-            tokenizer_name = "roberta-base"
-        model_name = tokenizer_name
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-        DATASET = CrossDataSetForCodeBERT
-        DATA_COLLATOR = CrossLangSearchDataCollatorforCodeBERT
-        model = CodeBERTBasedModel(
-            model_name=model_name,
-            alpha=args.alpha
-        )
-        model_specific_arguments_for_ranker = {
-            "tokenizer": tokenizer,
-            "no_train_rank": args.no_train_rank,
-        }
+        raise NotImplementedError(f"Unknown initial model {args.initial_model}")
     # logger.info(model)
     data_dir = args.data_path
     logger.info(data_dir)
@@ -370,60 +341,3 @@ if __name__ == '__main__':
                         logger, output_dir, training_args, trainer)
                 logger.info("*" * 70, "CAUTION", "*" * 70)
 
-    if args.do_rank:
-        test_file = os.path.join(data_dir, 'test.jsonl')
-        logger.info(f"Loading test examples from {test_file}")
-        test_examples = [
-            json.loads(l.strip()) for l in open(test_file).readlines()
-        ]
-        logger.info(f"Loades test examples from {len(test_examples)}")
-        ranker = Ranker(
-            data_class=DATASET, model_class=type(model),
-            additional_comp_for_ranker=model_specific_arguments_for_ranker,
-        )
-        best_validation_model_path = os.path.join(
-            output_dir, f'checkpoint-best-{training_args.metric_for_best_model}'
-        )
-        last_checkpoint = get_last_checkpoint(output_dir)
-        logger.info(
-            "#" * 50, "Ranking!", "#" * 50, sep="\n"
-        )
-        if args.no_train_rank:
-            checkpoint_types = [
-                ('no_training', None, True),
-            ]
-        else:
-            checkpoint_types = [
-                ('best_model', best_validation_model_path, False), 
-                ('last', last_checkpoint, False),
-            ]
-        for ckpt_type, ckpt_under_check, no_train_rank in checkpoint_types:
-            load_model(logger, model, ckpt_under_check, no_train_rank)
-            # logger.info('Model loaded!')
-            result, detailed_result, ranked_data = ranker.rank(
-                model=model,
-                examples=test_examples,
-                ignore_no_positives=True,
-                metric_function=compute_metrics
-            )
-            logger.info(
-                '=' * 50, ckpt_type, ckpt_under_check,
-                "\n" + json.dumps(result, indent=4),
-                '=' * 50, sep="\n"
-            )
-            if args.rank_result_path is not None:
-                os.makedirs(args.rank_result_path, exist_ok=True)
-                result_file = open(
-                    os.path.join(args.rank_result_path, f'{ckpt_type}.result'),
-                    'w'
-                )
-                json.dump(result, result_file, indent=4)
-                result_file.close()
-                details_file = open(
-                    os.path.join(
-                        args.rank_result_path, f'{ckpt_type}.details.json'
-                    ),
-                    'w'
-                )
-                json.dump(detailed_result, details_file)
-                details_file.close()

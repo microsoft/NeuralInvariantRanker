@@ -15,8 +15,6 @@ if True:
         sys.path.append(project_dir)
     from src.invgen import InvariantGenerator
     from src.codex_models.chat import VanillaChat
-    from src.codex_models.chat_with_feedback import ChatWithFeedback
-    from src.codex_models.breadth_limited_chat import BreadthLimitedChatWithFeedback
 
 
 def filter_examples_based_on_debug_need(
@@ -66,14 +64,10 @@ if __name__ == '__main__':
         problems_locations, config
     )
     if config.model_name.startswith('gpt-'):
-        if config.generation_type == 'depth':
-            model = ChatWithFeedback(config=config, model_name=config.model_name)
-        elif config.generation_type == 'breadth':
+        if config.generation_type == 'breadth':
             model = VanillaChat(config=config, model_name=config.model_name)
         else:
-            model = BreadthLimitedChatWithFeedback(
-                config=config, model_name=config.model_name
-            )
+            raise NotImplementedError(f"Unknown generation type {config.generation_type}")
     else:
         raise ValueError(f"Unknown model name {config.model_name}")
     
