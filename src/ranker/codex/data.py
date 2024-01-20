@@ -74,34 +74,14 @@ def get_embedding(
 
 
 class CrossDataSetForCodex(TorchDS):
-    @classmethod
-    def cache_raw_data(cls, raw_data, cache_path, codex_model):
-        logger.info(f"Creating the Cache Embedding for {codex_model}")
-        cache_file = get_codex_embedding_cache(cache_path, codex_model)
-        if os.path.exists(cache_file):
-            logger.info("Cache already exists!")
-            return json.load(open(cache_file))
-        data_cache = {}
-        all_content = []
-        for root, dirs, files in os.walk(raw_data):
-            for f in files:
-                if f.endswith('.java') or f.endswith('.py'):
-                    all_content.append(
-                        open(os.path.join(root, f)).read()
-                    )
-        for c in tqdm(all_content):
-            data_cache[c] = get_embedding(c, codex_model)
-        logger.info("Cache Collection Done!")
-        logger.info(f"Saving to {cache_file}")    
-        logger.info("=" * 30)       
-        with open(cache_file, 'w') as fp:
-            json.dump(data_cache, fp)
-            fp.close()
-        return data_cache
 
     @classmethod
     def get_dimension(cls, model_name):
-        return len(get_embedding(' ', codex_model=model_name))
+        # return len(get_embedding(' ', codex_model=model_name))
+        if model_name == 'davinci-similarity':
+            return 12288
+        else:
+            return len(get_embedding(' ', codex_model=model_name))
 
     def __init__(
         self,

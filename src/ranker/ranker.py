@@ -17,7 +17,7 @@ if True:
         os.path.join(os.path.abspath(__file__), "../../.."))
     if project_dir not in sys.path:
         sys.path.append(project_dir)
-    from src.ranker.codebert.data import CrossDataSetForCodeBERT
+    # from src.ranker.codebert.data import CrossDataSetForCodeBERT
     from src.ranker.codex.data import CrossDataSetForCodex
     from src.ranker.codex.models import Codex
     from src.ranker import util
@@ -56,29 +56,25 @@ class Ranker:
         self.model_class = model_class
         self.additional_comp_for_ranker = additional_comp_for_ranker
         assert (
-            self.data_class == CrossDataSetForCodex or
-            self.data_class == CrossDataSetForCodeBERT
+            self.data_class == CrossDataSetForCodex 
         )
-        if self.data_class == CrossDataSetForCodeBERT:
-            assert "tokenizer" in self.additional_comp_for_ranker.keys()
-        else:
-            assert "model_name" in self.additional_comp_for_ranker.keys()
+        assert "model_name" in self.additional_comp_for_ranker.keys()
         self.cache = {}
         if "cached_embeddings" in self.additional_comp_for_ranker.keys():
             self.cache = self.additional_comp_for_ranker["cached_embeddings"]
             self.additional_comp_for_ranker["cache"] = self.cache
-            logger.info(f"Loaded {len(self.cache.keys())} codes from the cache")
+            # logger.info(f"Loaded {len(self.cache.keys())} codes from the cache")
         elif "embedding_path" in self.additional_comp_for_ranker.keys():
             assert os.path.exists(
                 self.additional_comp_for_ranker["embedding_path"]
             )
-            logger.info(
-                f'Loading from  {self.additional_comp_for_ranker["embedding_path"]}'
-            )
+            # logger.info(
+            #     f'Loading from  {self.additional_comp_for_ranker["embedding_path"]}'
+            # )
             self.cache = json.load(
                 open(self.additional_comp_for_ranker["embedding_path"], "r")
             )
-            logger.info(f"Loaded {len(self.cache.keys())} codes from the cache")
+            # logger.info(f"Loaded {len(self.cache.keys())} codes from the cache")
             self.additional_comp_for_ranker["cache"] = self.cache
             self.additional_comp_for_ranker.pop("embedding_path")
 
@@ -89,8 +85,8 @@ class Ranker:
         _cache = None,
         bar_tqdm=None
     ):
-        if bar_tqdm is None:
-            bar_tqdm = tqdm
+        # if bar_tqdm is None:
+        #     bar_tqdm = tqdm
         # local_cache = {}
         if _cache is None:
             cache = {}
@@ -100,26 +96,31 @@ class Ranker:
             [e['code'] for k in range(len(examples)) \
                 for e in examples[k]['invariants']] 
         all_codes = list(set(all_codes))
-        logger.info(f'Total Code : {len(all_codes)}')
+        # logger.info(f'Total Code : {len(all_codes)}')
         not_found_codes = all_codes
-        logger.info(f'Code to be cached : {len(not_found_codes)}')
+        # logger.info(f'Code to be cached : {len(not_found_codes)}')
         batches = batchify(not_found_codes)
-        logger.info(
-            f"Created {len(batches)} batches for computing the vectors")
+        # logger.info(
+        #     f"Created {len(batches)} batches for computing the vectors")
         if cache is not None:
             self.additional_comp_for_ranker["cache"] = cache
-        logger.info(self.additional_comp_for_ranker.keys())
+        # logger.info(self.additional_comp_for_ranker.keys())
         local_cache = {}
-        for batch in bar_tqdm(batches):
+        if bar_tqdm is not None:
+            batches = bar_tqdm(batches)
+        for batch in batches:
             vectors = self.data_class.get_vector(
                 model=model, texts=batch, 
                 **self.additional_comp_for_ranker
             )
             for t, v in zip(batch, vectors):
                 local_cache[t] = v
-        logger.info(f"Inserted {len(local_cache.keys())} codes into the cache")
+        # logger.info(f"Inserted {len(local_cache.keys())} codes into the cache")
         sorted_results = []
-        bar = bar_tqdm(examples)
+        if bar_tqdm is None:
+            bar = examples
+        else:
+            bar = bar_tqdm(examples)
         for ex in bar:
             code = ex['problem']
             if code in local_cache:
@@ -170,8 +171,9 @@ class Ranker:
         logger.info(f'Cache size : {len(local_cache.keys())}')
         sorted_results = []
         if bar_tqdm is None:
-            bar_tqdm = tqdm
-        bar = bar_tqdm(examples)
+            bar = examples
+        else:
+            bar = bar_tqdm(examples)
         for ex in bar:
             code = ex['problem']
             invariants = ex['invariants']
