@@ -3,7 +3,7 @@ tiktoken
 nltk==3.8.1
 transformers==4.29.2
 datasets==1.18.3
-numpy==1.19.5
+numpy==1.22.0
 scikit-learn==1.2.1
 tenacity==8.2.2
 seaborn==0.12.2
