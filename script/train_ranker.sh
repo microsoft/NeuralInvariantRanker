@@ -2,7 +2,7 @@
 # Licensed under the MIT license.
 
 if [[ $# -lt 2 ]]; then
-    echo "Usage: $0 <codex-model-name[ada, babbage, curie, davinci, ada_002]> <fold> [max_positive] [max_negative] [alpha]"
+    echo "Usage: $0 <codex-model-name[davinci, ada_002]> <fold 0/1/2/3/4> [max_positive] [max_negative] [alpha]"
     exit 1
 fi
 
@@ -27,18 +27,16 @@ CONFIG_FILE="${BASE_DIR}/configs/ranker_config.json";
 LOG_DIR="${OUTPUT_DIR}/logs";
 mkdir -p ${LOG_DIR};
 
-if [[ $im == "ada" ]]; then
-    codex_model="ada-code-search-code"
-elif [[ $im == "ada_002" ]]; then
+echo $DATA_BASE_DIR
+
+if [[ $im == "ada_002" ]]; then
     codex_model="text-embedding-ada-002"
-elif [[ $im == "babbage" ]]; then
-    codex_model="babbage-code-search-code"
-elif [[ $im == "curie" ]]; then
-    codex_model="curie-similarity"
 elif [[ $im == "davinci" ]]; then
+    echo "Davinci-similarity model is deprecated. Please use ada_002 instead." >&2;
+    exit 1;
     codex_model="davinci-similarity"
 else
-    echo "Invalid codex model name: $im"
+    echo "Invalid codex model name: $im" >&2;
     exit 1
 fi
 
@@ -46,7 +44,7 @@ embedding_path="${DATA_BASE_DIR}/fold_${fold}/embeddings_${im}.json";
 
 if [[ ! -f $embedding_path ]]; then
     echo "Embedding file not found: $embedding_path"
-    echo "Please run `python ${DATA_BASE_DIR}/vectorize.py <data_path>` first!"
+    echo "Please run `python ${DATA_BASE_DIR}/vectorize.py fold_${fold}` first!"
     exit 1
 fi
 

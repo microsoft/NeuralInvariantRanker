@@ -1,0 +1,13 @@
+openai==0.28.1
+tiktoken
+nltk==3.8.1
+transformers==4.29.2
+datasets==1.18.3
+numpy==1.19.5
+scikit-learn==1.2.1
+tenacity==8.2.2
+seaborn==0.12.2
+matplotlib==3.6.0
+pandas==1.4.0
+jupyter
+ipywidgets

@@ -1,14 +1,24 @@
-# Project
+# Ranking LLM-Generated Loop Invariants for Program Verification
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+Official code release of out EMNLP 2023 work [NeuralInvariantRanker (iRank)](https://aclanthology.org/2023.findings-emnlp.614.pdf).
 
-As the maintainer of this project, please make a few updates:
+## About the Ranker
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+## News
+- January 2024: Official code release. 
+
+## Setup
+### Requirement
+```
+```
+### About the data
+
+### Training the ranker
+
+### Evaluation and Visualization
+
+
+## Invariant Generation
 
 ## Contributing
 
