@@ -24,7 +24,6 @@ if True:
         sys.path.append(PROJECT_PATH)
     from src import util
     from src.ligen.loopinv import verify
-    from src.ligen.parse import identify_ssa_and_nonssa_vars_in_invariant as variable_separator
     from src.config import Config
     from src.codex_models.model_base import InvGenModelBase
     from src.codex_models.utils import (
@@ -68,13 +67,7 @@ class VanillaChat(InvGenModelBase):
         raise NotImplementedError(
             "This is vanilla chat, no feedback is needed.")
 
-    # @retry(
-    #     wait=wait_random_exponential(min=1, max=60),
-    #     stop=stop_after_attempt(10),
-    #     retry=retry_if_exception_type(openai.error.RateLimitError)
-    # )
     def query_model_with_tenacity(self, prompt: str, n):
-        # logger.info(f"Querying with Tenacity! {self.config.parallel}")
         parameters = {
             "messages": prompt,
             "temperature": self.config.temperature,
@@ -85,8 +78,8 @@ class VanillaChat(InvGenModelBase):
             parameters["engine"] = self.deployment_name
         else:
             parameters["model"] = self.model_name
-        # logger.info(json.dumps(parameters, indent=4))
-        response = openai.ChatCompletion.create(**parameters)
+        response = None
+        # TODO: Implement the openai call with the updated openai API.
         return response
 
     def query_with_retries(
@@ -107,7 +100,6 @@ class VanillaChat(InvGenModelBase):
                 logger.info(f"Current Length: {response_len} {max_generations}")
             n = min(max_generations - response_len,
                     self.config.rate_limit_per_minute)
-            # logger.info(f"Querying with n={n}")
             retry_count = 0
             response = None
             while retry_count < self.config.num_retries:
@@ -118,20 +110,10 @@ class VanillaChat(InvGenModelBase):
                 except Exception as e:
                     logger.warn(f'Delay {delay}\t{type(e)}\t{e}')
                     time.sleep(delay)
-            # logger.info(json.dumps(response, indent=4))
             if response is None:
                 continue
             responses.extend(response['choices'])
             response_len += len(response['choices'])
-            # break
-            # except Exception as e:
-            #     logger.warn(f'{type(e)}\t{e}')
-            #     if "Please reduce " in str(e):
-            #         if auto_truncate:
-            #             prompt = self.truncate(prompt, self.model_name)
-            #         else:
-            #             return responses
-            #     time.sleep(delay)
             if start_time is not None:
                 time_spent = time.time() - start_time
                 if (
@@ -158,12 +140,9 @@ class VanillaChat(InvGenModelBase):
         auto_truncate: Optional[bool] = False,
         start_time: Optional[float] = None,
     ) -> List[str]:
-        # logger.info(f"Generating invariants for {problem}")
         prompt = self.generate_prompt(
             problem, instruction=instruction, c_problem=c_problem_stmt
         )
-        # logger.info(json.dumps(prompt, indent=4))
-        # if not self.config.parallel: logger.info("Querying OpenAI...")
         responses = self.query_with_retries(
             prompt=prompt,
             max_generations=max_generations,
@@ -179,7 +158,6 @@ class VanillaChat(InvGenModelBase):
                 invariants.append(inv)
             except Exception as e:
                 logger.warn(f'{type(e)}\t{e}')
-        # logger.info(*invariants, sep='\n')
         filtered_invariants = []
         for inv in invariants:
             tag_filtered_inv = filter_invariant_based_on_tag(
@@ -194,15 +172,6 @@ class VanillaChat(InvGenModelBase):
             filtered_invariants = new_invs_and_update_cache(
                 filtered_invariants, inv_cache, self.config.semantic_deduplicate
             )
-        global global_count_ssas, global_definition_map
-        ssa, _ = variable_separator(problem_definition=problem)
-        for f in filtered_invariants:
-            for s in ssa:
-                if s in f:
-                    if problem not in global_count_ssas:
-                        global_count_ssas[global_definition_map[problem]] = []
-                    global_count_ssas[global_definition_map[problem]].append(
-                        (f, s))
         if not self.config.parallel:
             logger.info(
                 f"Identified {len(filtered_invariants)} deduplication." +\

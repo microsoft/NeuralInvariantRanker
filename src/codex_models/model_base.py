@@ -134,8 +134,6 @@ class InvGenModelBase:
                 f"{non_ssa}\n DO NOT use any of the following variable in the invariant body: " +\
                 f"{ssa}\n\n"
 
-
-
         prompt = [{
             'role': 'user',
             'content': msg
@@ -159,7 +157,6 @@ class InvGenModelBase:
         ] + prompt
         if self.is_prompt_within_token_limit(new_prompt):
             prompt = new_prompt
-        # logger.info(json.dumps(prompt, indent=2))
         return prompt
 
     def query_with_retries(
