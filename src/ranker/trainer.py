@@ -36,12 +36,6 @@ if True:
     logger = util.get_logger(__file__)
 
 
-# if is_torch_tpu_available():
-#     import torch_xla.core.xla_model as xm
-
-# if is_sagemaker_mp_enabled():
-#     import smdistributed.modelparallel.torch as smp
-
 def _mean(values):
     if isinstance(values, list):
         if len(values) == 0:
@@ -59,7 +53,6 @@ def compute_metrics(
 ) -> Dict[str, float]:
     similarity_scores = eval_prediction.predictions # (NUM_SAMPLE, D), (1000, 10)
     labels = eval_prediction.label_ids # (NUM_SAMPLE, D)
-    # print(similarity_scores.shape, labels.shape)
     num_ex, _ = similarity_scores.shape
     count_at_k = {1: [], 2: [], 5: [], 10: [], 20: [], 50: [], 100: []}
     v_at_k = {1: [], 2: [], 5: [], 10: [], 20: [], 50: [], 100: []}
