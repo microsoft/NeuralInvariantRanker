@@ -77,7 +77,7 @@ class Ranker:
         self, 
         model: nn.Module,
         examples: List[Dict[str, Any]],
-        _cache = None,
+        _cache: Dict[str, List[float]] = None,
         bar_tqdm=None
     ):
         if _cache is None:

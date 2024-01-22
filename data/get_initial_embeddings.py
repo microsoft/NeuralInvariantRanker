@@ -7,6 +7,7 @@ import tiktoken
 import openai
 from tqdm import tqdm
 import threading
+from typing import List, Dict, Optional
 
 used_tokens_in_one_minute = 0
 this_file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -87,7 +88,11 @@ class Embedder:
         embeddings = [d.embedding for d in response.data]
         return embeddings, response.usage.total_tokens
     
-    def embed(self, texts, existing_embeddings={}):
+    def embed(
+        self, 
+        texts: List[str], 
+        existing_embeddings: Optional[Dict[str, List[float]]] = {}
+    ) -> Dict[str, List[float]]:
         prepared_inputs = []
         for t in texts:
             if t in existing_embeddings:
@@ -187,7 +192,6 @@ if __name__ == "__main__":
         'API_VERSION: Version of the Azure OpenAI API, '
         'API_KEY: API key for the Azure OpenAI API'
     )
-    parser.add_argument('--force', '-f', action='store_true', help='Force recompute embeddings')
     parser.add_argument('--token_per_minute', '-t', type=int, default=10000, help='Token per minute limit')
     
     parser.add_argument(
