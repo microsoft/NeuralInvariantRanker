@@ -2,7 +2,7 @@
 
 In this directory, we are organizing the problem descriptions of Loop Invariant generation problem. 
 
-The problems are taken from [LoopInvGen benchmark](https://github.com/SaswatPadhi/LoopInvGen/tree/master/benchmarks) organized by Padhi et al. (PLDI'16). These problems are organized in [SyGus](https://arxiv.org/pdf/2312.06001.pdf) format. This [readme](https://github.com/SaswatPadhi/LoopInvGen/blob/master/benchmarks/README.md) provides details description of these benchmarks. 
+The problems are taken from [LoopInvGen benchmark](https://github.com/SaswatPadhi/LoopInvGen/tree/master/benchmarks) organized by Padhi et al. (PLDI'16). These problems are compiled in [SyGus](https://arxiv.org/pdf/2312.06001.pdf) format and released under [MIT License](https://github.com/SaswatPadhi/LoopInvGen/blob/master/LICENSE.md). This [readme](https://github.com/SaswatPadhi/LoopInvGen/blob/master/benchmarks/README.md) provides details description of these benchmarks. 
 
 In the [`in_scope`](in_scope/) folder, there are 541 problem descriptions (`*.sl`) files, subset of the problems in original LoopInvGen problems. 
 
