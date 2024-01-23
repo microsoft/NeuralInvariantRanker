@@ -113,6 +113,9 @@ bash train_ranker.sh ada_002 0
 ```
 will train a ranker based on the training data in [`data/ranker_data/fold_0`](data/ranker_data/fold_0) and the initial embedding from `text-embedding-ada-002` (initial embeddings should already be computed as [`data/embeddings/ada_002.json`](data/embeddings/ada_002.json)).
 
+### Training parameters:
+The training parameters (_e.g.,_ `batch_size`, `max_training_steps`, `evaluation_strategy`, etc. are controlled by an external `json` file.) The file is passed to the training in [`script/train_ranker.sh`](script/train_ranker.sh). By default, [`configs/ranker_config.json`](configs/ranker_config.json) is used for the training. Change this file for experimenting with other parameters, or create a new file and update [this line](script/train_ranker.sh#L25) with appropriate config file path. 
+
 ## Evaluation and Visualization
 After the training is done, we provide [this notebook](data/gather_metrics.ipynb) to evaluate and visualize the LLM-generated invariants. Note that, we performed **5-fold cross validation** for evaluating the ranker. To get results from this notebook, make sure to train models for **all 5 folds** and both **`ada_002`** amd **`dainci`** models. 
 
