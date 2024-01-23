@@ -27,61 +27,15 @@ if True:
     logger = get_logger(__file__)
 
 
-def get_codex_embedding_cache(cache_path, model_name):
-    return os.path.join(
-        cache_path, 
-        f'codex_emb_cache-{model_name}.json'
-    )
-
-
-def get_embedding(
-        _text, 
-        codex_model='babbage-code-search-code', 
-        cache: Optional[Dict[str, Any]] = None
-    ):
-    text = copy.copy(_text)
-    if text.strip() == '':
-        text = "dummy"
-    if cache is not None and text in cache.keys():
-        return cache[text]
-    sleep_time = 5
-    while True:
-        try:
-            emb = openai.Embedding.create(
-                input=[text], model=codex_model
-            )['data'][0]['embedding']
-            if cache is not None:
-                cache[text] = emb
-            return emb
-        except openai.error.RateLimitError as e:
-            # print(f"Exception in get_codex_response_with_retries {e}")
-            logger.error(type(e), e)
-            if 'Please reduce' in str(e):
-                text = text[:int(.9 * len(text))]
-            time.sleep(sleep_time)
-        except openai.error.OpenAIError as e:
-            # print(f"Exception in get_codex_response_with_retries {e}")
-            logger.error(type(e), e)
-            if 'Please reduce' in str(e):
-                text = text[:int(.9 * len(text))]
-            time.sleep(sleep_time)
-        except Exception as e:
-            # print(f"Exception in get_codex_response_with_retries {e}")
-            logger.error(type(e), e)
-            if 'Please reduce' in str(e):
-                text = text[:int(.9 * len(text))]
-            time.sleep(sleep_time)
-
-
-class CrossDataSetForCodex(TorchDS):
-
+class RankerDataSetForCodex(TorchDS):
     @classmethod
     def get_dimension(cls, model_name):
-        # return len(get_embedding(' ', codex_model=model_name))
         if model_name == 'davinci-similarity':
             return 12288
+        elif model_name == 'text-embedding-ada-002':
+            return 1536
         else:
-            return len(get_embedding(' ', codex_model=model_name))
+            raise Exception(f"Unknown model name {model_name}")
 
     def __init__(
         self,
@@ -92,7 +46,7 @@ class CrossDataSetForCodex(TorchDS):
         cache_dir: Optional[str] = None,
         num_workers: Optional[int] = 16,
         load_from_cache: Optional[bool] = True,
-        codex_model: Optional[str] = 'babbage-code-search-text',
+        codex_model: Optional[str] = 'text-embedding-ada-002',
         max_positive_examples: Optional[int] = 3,
         max_negative_examples: Optional[int] = 3,
         *args, **kwargs
@@ -108,26 +62,16 @@ class CrossDataSetForCodex(TorchDS):
             cached_embeddings = json.load(open(kwargs["embedding_path"]))
             logger.info(f'Loaded {len(cached_embeddings)} embeddings')
         else:
-            cached_embeddings = CrossDataSetForCodex.cache_raw_data(
-                kwargs["raw_data"], cache_dir, codex_model
-            )
+            raise Exception("Initial embeddings not provided")
         self.data = load_dataset(
-            path=path,
-            data_dir=path,
-            data_files=data_files,
-            split="train",
-            cache_dir=cache_dir,
-            name=name
+            path=path, data_dir=path, data_files=data_files, split="train", cache_dir=cache_dir, name=name
         )
         columns = self.data.column_names
         self.count = 0
 
         def find_embedding(text):
             if text not in cached_embeddings.keys():
-                logger.error(f"Not found in cache - {text}")
-                cached_embeddings[text] = get_embedding(
-                    text, self.codex_model
-                )
+                raise Exception(f"Embedding not found for {text}")
             return cached_embeddings[text]
         
         def prepare_features(examples):
@@ -135,7 +79,6 @@ class CrossDataSetForCodex(TorchDS):
             self.count += 1
             inputs = examples["code"]
             input_vector = torch.Tensor(
-                # get_embedding(inputs, self.codex_model)
                 find_embedding(inputs)
             )
             # Process the positive vectors - upto the max_positives
@@ -215,21 +158,20 @@ class CrossDataSetForCodex(TorchDS):
 
     @classmethod
     def get_vector(
-        cls, 
-        model_name: str, 
-        model: CodexBasedModel,
-        texts: Union[str, List[str]],
-        cache: Optional[Dict[str, List[float]]] = None,
-        no_train_rank: bool = False,
+        cls, model_name: str, model: CodexBasedModel, texts: Union[str, List[str]],
+        cache: Dict[str, List[float]], no_train_rank: bool = False,
         **kwargs
     ):
         batched = True
         if isinstance(texts, str):
             batched = False
             texts = [texts]
-        embeddings = [
-            get_embedding(t, model_name, cache) for t in texts
-        ]
+        embeddings = []
+        for t in texts:
+            if t in cache.keys():
+                embeddings.append(cache[t])
+            else:
+                raise Exception(f"Embedding not found for {t}")
         device = next(model.parameters()).device
         embeddings = torch.Tensor(embeddings)
         embeddings = embeddings.to(device)
@@ -249,7 +191,7 @@ class CrossDataSetForCodex(TorchDS):
         model: CodexBasedModel,
         texts: Union[str, List[str]]
     ):
-        return CrossDataSetForCodex.get_vector(
+        return RankerDataSetForCodex.get_vector(
             model_name=self.codex_model,
             model=model,
             texts=texts
@@ -263,7 +205,7 @@ class CrossDataSetForCodex(TorchDS):
 
 
 @dataclass
-class CrossLangSearchDataCollatorforCodex(DefaultDataCollator):
+class RankerDataCollatorforCodex(DefaultDataCollator):
     def __call__(
         self,
         features: List[Dict[str, Any]],

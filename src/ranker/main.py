@@ -21,8 +21,8 @@ if True:
     if project_dir not in sys.path:
         sys.path.append(project_dir)
     from src.ranker.codex.data import (
-        CrossDataSetForCodex,
-        CrossLangSearchDataCollatorforCodex
+        RankerDataSetForCodex,
+        RankerDataCollatorforCodex
     )
     from src.ranker.codex.models import (
         CodexBasedModel, CodexBasedClassificationModel
@@ -181,9 +181,9 @@ if __name__ == '__main__':
         training_args.local_rank = args.local_rank
     cached_embeddings = None
     if args.initial_model == 'codex':
-        DATASET = CrossDataSetForCodex
-        DATA_COLLATOR = CrossLangSearchDataCollatorforCodex
-        hidden_dim = CrossDataSetForCodex.get_dimension(args.codex_model)
+        DATASET = RankerDataSetForCodex
+        DATA_COLLATOR = RankerDataCollatorforCodex
+        hidden_dim = RankerDataSetForCodex.get_dimension(args.codex_model)
         if args.use_classification_model:
             model  = CodexBasedClassificationModel(
                 hidden_dim=hidden_dim,

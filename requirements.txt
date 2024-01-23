@@ -1,4 +1,6 @@
-openai==0.28.1
+--extra-index-url https://download.pytorch.org/whl/cu116
+torch==1.13.1+cu116
+openai==1.4.0
 tiktoken
 nltk==3.8.1
 transformers==4.29.2

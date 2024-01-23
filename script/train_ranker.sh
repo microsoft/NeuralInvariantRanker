@@ -19,7 +19,7 @@ alpha=${5:-"0"};
 
 name="${im}/mp-${mp}_mn-${mn}_alpha-${alpha}/fold_${fold}"; 
 
-DATA_BASE_DIR="${BASE_DIR}/data/ranker_data";
+DATA_BASE_DIR="${BASE_DIR}/data";
 OUTPUT_DIR="${BASE_DIR}/models/ranker_result/${name}";
 
 CONFIG_FILE="${BASE_DIR}/configs/ranker_config.json";
@@ -32,7 +32,7 @@ echo $DATA_BASE_DIR
 if [[ $im == "ada_002" ]]; then
     codex_model="text-embedding-ada-002"
 elif [[ $im == "davinci" ]]; then
-    echo "Davinci-similarity model is deprecated. Please use ada_002 instead." >&2;
+    echo "davinci-similarity model is deprecated. Please use ada_002 instead." >&2;
     exit 1;
     codex_model="davinci-similarity"
 else
@@ -40,11 +40,12 @@ else
     exit 1
 fi
 
-embedding_path="${DATA_BASE_DIR}/fold_${fold}/embeddings_${im}.json";
+embedding_path="${DATA_BASE_DIR}/embeddings/${im}.json";
 
 if [[ ! -f $embedding_path ]]; then
     echo "Embedding file not found: $embedding_path"
-    echo "Please run `python ${DATA_BASE_DIR}/vectorize.py fold_${fold}` first!"
+    echo "Please run 'python ${DATA_BASE_DIR}/get_initial_embeddings.py' first!";
+    echo "Run 'python ${DATA_BASE_DIR}/get_initial_embeddings.py --help' for more information."
     exit 1
 fi
 
