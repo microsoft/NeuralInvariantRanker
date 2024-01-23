@@ -50,7 +50,7 @@ if [[ ! -f $embedding_path ]]; then
 fi
 
 python $BASE_DIR/src/ranker/main.py \
-    --data_path ${DATA_BASE_DIR}/fold_${fold} \
+    --data_path ${DATA_BASE_DIR}/ranker_data/fold_${fold} \
     --embedding_path $embedding_path \
     --training_config ${CONFIG_FILE} \
     --output_dir ${OUTPUT_DIR} \
