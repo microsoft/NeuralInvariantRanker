@@ -2,28 +2,13 @@
 # Licensed under the MIT license.
 
 import os
-import random
-import warnings
 from torch import nn
 import numpy as np
 import torch
-from transformers import is_torch_tpu_available
-from transformers.trainer_utils import EvalPrediction
-from transformers.file_utils import is_sagemaker_mp_enabled
-from transformers.trainer import (
-    Trainer,
-    OPTIMIZER_NAME,
-    SCHEDULER_NAME,
-    SCALER_NAME,
-    TRAINER_STATE_NAME
-)
+from transformers import EvalPrediction
+from transformers import Trainer
+
 from typing import Dict, Union, Tuple, Optional, List, Any
-from transformers.trainer_pt_utils import reissue_pt_warnings
-from transformers.trainer_utils import (
-    PREFIX_CHECKPOINT_DIR,
-    ShardedDDPOption
-)
-from transformers.utils import logging
 import os
 import sys
 

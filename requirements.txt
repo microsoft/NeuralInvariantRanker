@@ -11,5 +11,6 @@ tenacity==8.2.2
 seaborn==0.12.2
 matplotlib==3.6.0
 pandas==1.4.0
+accelerate==0.26.1
 jupyter
 ipywidgets
