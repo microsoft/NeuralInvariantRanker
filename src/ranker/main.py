@@ -9,8 +9,6 @@ import numpy as np
 import traceback
 import torch
 import shutil
-from datasets import load_dataset
-from transformers import AutoTokenizer
 from transformers.training_args import TrainingArguments
 from transformers.trainer_utils import get_last_checkpoint
 import sys
@@ -28,8 +26,6 @@ if True:
         CodexBasedModel, CodexBasedClassificationModel
     )
     from src.ranker.trainer import CrossLangCodeSearchTrainer, compute_metrics
-    from src.ranker.atomic_code_util import DelayedKeyboardInterrupt
-    from src.ranker.ranker import Ranker
     from src.ranker import util
     logger = util.get_logger(__file__)
 
@@ -286,8 +282,6 @@ if __name__ == '__main__':
             embedding_path=args.embedding_path,
             cached_embeddings=cached_embeddings,
         )
-        # logger.info(train_dataset.max_positive_examples, train_dataset.max_negative_examples)
-        # logger.info(eval_dataset.max_positive_examples, eval_dataset.max_negative_examples)
         trainer = CrossLangCodeSearchTrainer(
             model=model,
             args=training_args,
@@ -296,48 +290,31 @@ if __name__ == '__main__':
             data_collator=DATA_COLLATOR(),
             compute_metrics=compute_metrics
         )
-        try:
-            if args.do_not_reload_from_checkpoint:
-                trainer.train()
-            else:
-                last_checkpoint = get_last_checkpoint(output_dir)
-                try:
-                    if last_checkpoint is not None:
-                        ckpt_number = last_checkpoint.split("-")[-1]
-                        try:
-                            ckpt_number = int(ckpt_number)
-                        except ValueError:
-                            pass
-                    else:
-                        ckpt_number = last_checkpoint
-                    if not isinstance(ckpt_number, int):
-                        logger.info("Did not find a valid checkpoint")
-                        logger.info("Starting from scratch")
-                        trainer.train()
-                    else:
-                        trainer.train(resume_from_checkpoint=last_checkpoint)
-                except KeyboardInterrupt:
-                    raise KeyboardInterrupt
-                except Exception as ex:
-                    traceback.print_exc()
-                    logger.info(
-                        f"Found an exception {ex} of type {type(ex)}. "
-                        "Carefully inspect the stacktrace")
-                    exit(1)
-            if trainer.state.best_model_checkpoint is not None:
-                save_best_validation_ckpt(
-                    logger, output_dir, training_args, trainer)
-        except KeyboardInterrupt:
-            with DelayedKeyboardInterrupt():
-                logger.info("*" * 50)
-                logger.info("*" * 20, "CAUTION", "*" * 20)
-                logger.info("Keyboard Interrupt encountered!!")
-                logger.info("Saving the checkpoint in ",
-                            trainer.state.global_step)
-                trainer.save_checkpoint()
-                logger.info("Checkpoint Saved!")
-                if trainer.state.best_model_checkpoint is not None:
-                    save_best_validation_ckpt(
-                        logger, output_dir, training_args, trainer)
-                logger.info("*" * 70, "CAUTION", "*" * 70)
-
+        if args.do_not_reload_from_checkpoint:
+            trainer.train()
+        else:
+            last_checkpoint = get_last_checkpoint(output_dir)
+            try:
+                if last_checkpoint is not None:
+                    ckpt_number = last_checkpoint.split("-")[-1]
+                    try:
+                        ckpt_number = int(ckpt_number)
+                    except ValueError:
+                        pass
+                else:
+                    ckpt_number = last_checkpoint
+                if not isinstance(ckpt_number, int):
+                    logger.info("Did not find a valid checkpoint")
+                    logger.info("Starting from scratch")
+                    trainer.train()
+                else:
+                    trainer.train(resume_from_checkpoint=last_checkpoint)
+            except Exception as ex:
+                traceback.print_exc()
+                logger.info(
+                    f"Found an exception {ex} of type {type(ex)}. "
+                    "Carefully inspect the stacktrace")
+                exit(1)
+        if trainer.state.best_model_checkpoint is not None:
+                save_best_validation_ckpt(logger, output_dir, training_args, trainer)
+        
