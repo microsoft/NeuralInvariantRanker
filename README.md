@@ -51,7 +51,7 @@ Training data is formatted as `jsonl` file, where each line corresponds to an ex
 }
 ```
 
-```json
+<!-- ```json
 {
     "problem_id": "ALIA-others__inc-array", 
     "code": "(set-logic ALIA)\n\n(synth-inv inv_fun ((x (Array Int Int))))\n\n(define-fun pre_fun ((x (Array Int Int))) Bool\n    (= 1 (select x 0)))\n(define-fun trans_fun ((x (Array Int Int)) (x! (Array Int Int))) Bool\n    (and (< (select x 0) 100) (= x! (store x 0 (+ (select x 0) 2)))))\n(define-fun post_fun ((x (Array Int Int))) Bool\n    (or (not (>= (select x 0) 100)) (= (select x 0) 101)))\n\n(inv-constraint inv_fun pre_fun trans_fun post_fun)\n\n(check-synth)\n\n",
@@ -70,7 +70,7 @@ Training data is formatted as `jsonl` file, where each line corresponds to an ex
         ...
     ]
 }
-```
+``` -->
 
 
 ## Initial Embeddings
