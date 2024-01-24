@@ -1,6 +1,6 @@
 # Ranking LLM-Generated Loop Invariants for Program Verification
 
-Official code release of out EMNLP 2023 work [NeuralInvariantRanker (iRank)](https://aclanthology.org/2023.findings-emnlp.614.pdf).
+Official code release of out EMNLP 2023 work [NeuralInvariantRanker](https://aclanthology.org/2023.findings-emnlp.614.pdf).
 
 
 ## About the Ranker
@@ -50,7 +50,7 @@ Training data is formatted as `jsonl` file, where each line corresponds to an ex
     ]
 }
 ```
-<!-- For example
+
 ```json
 {
     "problem_id": "ALIA-others__inc-array", 
@@ -71,10 +71,10 @@ Training data is formatted as `jsonl` file, where each line corresponds to an ex
     ]
 }
 ```
-Note that, for all positives examples in our training data, score is 1.00, and for the negatives the score denotes how many  -->
+
 
 ## Initial Embeddings
-We collect initial embeddings from two different [OpenAI embedding](https://platform.openai.com/docs/guides/embeddings) models. Before starting the training, the initial embeddings must be gathered. We provide [this scrupt](data/get_initial_embeddings.py) to gather the initial embeddings. To run the script, 
+We collect initial embeddings from two different [OpenAI embedding](https://platform.openai.com/docs/guides/embeddings) models. Before starting the training, the initial embeddings must be gathered. We provide [this script](data/get_initial_embeddings.py) to gather the initial embeddings. To run the script, 
 ```
 python data/get_initial_embeddings.py \
     --model_name <MODEL_NAME, default = ada_002> \
