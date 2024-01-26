@@ -91,7 +91,7 @@ Note that, this script can both use [OpenAI api](https://github.com/openai/opena
     "API_VERSION": "<version of the api>"
 }
 ```
-While in the paper we experimented with two different embedding models, _i.e.,_ `text-embedding-ada-002` and `davinci-similarity`, the `davinci-similarity` model is deprecated, and hence cannot be collected with the initial embedding script. Please download the initial embeddings for `davinci-similarity` model from [this link](https://zenodo.org/records/10574048), to reproduce our results. 
+While in the paper we experimented with two different embedding models, _i.e.,_ `text-embedding-ada-002` and `davinci-similarity`, the `davinci-similarity` model is deprecated, and hence cannot be collected with the initial embedding script. Please download the initial embeddings from [this link](https://zenodo.org/records/10574048), to reproduce our results. 
 
 ***Important Note.*** The embedding files are large with the `text-embedding-ada-002` embedding file (`ada_002.json`) sized 12GB and `davinci-embedding` embedding file (`davinci.json`) sized 34GB. For both [training](#training-the-ranker) ([this file](src/ranker/main.py#L201)), and [evaluation](#evaluation-and-visualization) ([this file](data/gather_metrics.ipynb#L50)) loads the entire embedding dictionary to memory, consequently the training and evaluation is very memoru intensive. For replicating this tool in a resource constraint environment, we suggest to re-implement the loading the initial embedding in a lazy way. In future, we may release an update with the lazy loading. 
 
