@@ -30,7 +30,7 @@ We provide to version of the data. Follow the steps below to extract the dataset
 2. **Evaluation data :** Evaluation data is available in [`data/llm-genrated-solutions/solutions.zip`](data/llm-genrated-solutions/solutions.zip). Extract the evaluation data with `cd data/llm-genrated-solutions; unzip solutions.zip;`. 
 
 Training data is formatted as `jsonl` file, where each line corresponds to an example. The format of an example is as follows
-```json
+```
 {
     "problem_id": "<unique id of the problem>",
     "code": "code of the problem, i.e., problem description",
@@ -51,7 +51,7 @@ Training data is formatted as `jsonl` file, where each line corresponds to an ex
 }
 ```
 
-<!-- ```json
+<!-- ```
 {
     "problem_id": "ALIA-others__inc-array", 
     "code": "(set-logic ALIA)\n\n(synth-inv inv_fun ((x (Array Int Int))))\n\n(define-fun pre_fun ((x (Array Int Int))) Bool\n    (= 1 (select x 0)))\n(define-fun trans_fun ((x (Array Int Int)) (x! (Array Int Int))) Bool\n    (and (< (select x 0) 100) (= x! (store x 0 (+ (select x 0) 2)))))\n(define-fun post_fun ((x (Array Int Int))) Bool\n    (or (not (>= (select x 0) 100)) (= (select x 0) 101)))\n\n(inv-constraint inv_fun pre_fun trans_fun post_fun)\n\n(check-synth)\n\n",
@@ -93,15 +93,15 @@ Note that, this script can both use [OpenAI api](https://github.com/openai/opena
 ```
 While in the paper we experimented with two different embedding models, _i.e.,_ `text-embedding-ada-002` and `davinci-similarity`, the `davinci-similarity` model is deprecated, and hence cannot be collected with the initial embedding script. Please download the initial embeddings from [this link](https://zenodo.org/records/10574048), to reproduce our results. 
 
-***Important Note.*** The embedding files are large with the `text-embedding-ada-002` embedding file (`ada_002.json`) sized 12GB and `davinci-embedding` embedding file (`davinci.json`) sized 34GB. For both [training](#training-the-ranker) ([this file](src/ranker/main.py#L201)), and [evaluation](#evaluation-and-visualization) ([this file](data/gather_metrics.ipynb#L50)) loads the entire embedding dictionary to memory, consequently the training and evaluation is very memoru intensive. For replicating this tool in a resource constraint environment, we suggest to re-implement the loading the initial embedding in a lazy way. In future, we may release an update with the lazy loading. 
+***Important Note.*** The embedding files are large with the `text-embedding-ada-002` embedding file (`ada_002.json`) sized 12GB and `davinci-embedding` embedding file (`davinci.json`) sized 34GB. Both the [training script](#training-the-ranker) ([this file](src/ranker/main.py#L201)), and [evaluation script](#evaluation-and-visualization) ([this file](data/gather_metrics.ipynb#L50)) loads the entire embedding dictionary to memory, consequently the training and evaluation is very memoru intensive. For replicating this tool in a resource constraint environment, we suggest to re-implement the loading the initial embedding in a lazy fashion. In future, we may release an update with the lazy loading. 
 
 For any other embedding models than OpenAI embeddings, implement your Embedder extending the [`Embedder`](data/get_initial_embeddings.py#L30). Your class should contain the following method 
 ```py
-    def embed(
-        self, 
-        texts: List[str], 
-        existing_embeddings: Optional[Dict[str, List[float]]] = {}
-    ) -> Dict[str, List[float]]:
+def embed(
+    self, 
+    texts: List[str], 
+    existing_embeddings: Optional[Dict[str, List[float]]] = {}
+) -> Dict[str, List[float]]:
 ```
 
 ## Training the ranker
@@ -123,13 +123,13 @@ After the training is done, we provide [this notebook](data/gather_metrics.ipynb
 
 Alternatively, for ranking other problems and corresponding candidate invariants, we refer to [this function](src/ranker/ranker.py#L76). This function signature is as follows
 ```py
-    def rank_invariants(
-        self, 
-        model: nn.Module,
-        examples: List[Dict[str, Any]],
-        _cache: Dict[str, List[float]] = None,
-        bar_tqdm=None
-    ):
+def rank_invariants(
+    self, 
+    model: nn.Module,
+    examples: List[Dict[str, Any]],
+    _cache: Dict[str, List[float]] = None,
+    bar_tqdm=None
+):
 ```
 The `model` is the trained ranker model, `examples` are a list of ranking examples formatter as below, and `_cache` is the initial embeddings dictionary, that **must** contain the initial embeddings for the problem and invariants in the examples. Each of the example for this function should be
 ```
