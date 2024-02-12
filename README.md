@@ -10,7 +10,7 @@ The tool is used for ranking LLM-generated Loop Invariants. We evaluate the inva
 
 
 ## News
-- January 2024: Official code release. 
+- February 2024: Official code release. 
 
 ## Step by step guide
 - [**Step 1**](#requirement) - Make sure all the requirements are successfully installed.  
