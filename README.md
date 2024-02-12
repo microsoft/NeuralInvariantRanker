@@ -148,6 +148,11 @@ The function will reorder the `"invariants"` list in each of the examples and ad
 ## Invariant Generation
 While the focus of this project to train ranker for invariants, we provide the prompt templete that we used to generate invariants using LLM in [`src/codex_models/chat.py`](src/codex_models/chat.py#L98). 
 
+## Known Limitations
+1. We assumed the cost of calling LLMs is negligible compared to the cost of calling the verifier for checking an invariant. In the case where call to LLM is much more expensive than LLM, this reanker will reduce the number of Z3 calls, but may not contribute to actual cost savings.
+
+4. While the ranker empirically showed performance improvement to place the correct invariants at top positions of the rank list, before using the invariant in real verification, it should be empirically studied in the actual deployment scenario. Without such a study, there is no guarantee that the ranker would rank the correct invariant at the higher positions, which may theat the overall efficacy of the verifier to verify the program.  
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
