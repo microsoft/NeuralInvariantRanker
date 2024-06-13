@@ -20,7 +20,7 @@ The tool is used for ranking LLM-generated Loop Invariants. We evaluate the inva
 - [**Step 5**](#evaluation-and-visualization) - Evaluate and Visualize the results of the ranker.
 
 
-## Requirement
+## Requirements
 The requirements of this project are as follows. We built the tool based on python 3.9. We evaluated the project in [`PyTorch-1.13.1` (with cuda 11.6)](https://pytorch.org/get-started/previous-versions/#v1131) and [`Transformers-4.36.0`](https://github.com/huggingface/transformers/releases/tag/v4.36.0). Other versions of the libraries may need modification of the code, specially the [`trainer.py`](src/ranker/trainer.py) (and perhaps other places). To setup the appropriate library versions, run `pip install -r requirements.txt`. 
 
 ## About the data
