@@ -82,7 +82,7 @@ python data/get_initial_embeddings.py \
     --token_per_minute TOKEN_PER_MINUTE \
     --output_dir <directory where the embeddings will be saved as MODEL_NAME.json, default = data/embeddings>
 ```
-Note that, this script can both use [OpenAI api](https://github.com/openai/openai-python/releases/tag/v1.4.0) and [Azure OpenAI api](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview). For using OpenAI api, the API key must be exported as `OPENAI_API_KEY` environment variable. Run `export OPENAI_API_KEY=<Your API Key>`. For using Azure Open AI api, a azure config json file is needed with the above script (`--azure_config`). The Config file should be formatted as, 
+Note that, this script can both use [OpenAI API](https://github.com/openai/openai-python/releases/tag/v1.4.0) and [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview). For using OpenAI API, the API key must be exported as `OPENAI_API_KEY` environment variable. Run `export OPENAI_API_KEY=<Your API Key>`. For using Azure OpenAI API, a azure config json file is needed with the above script (`--azure_config`). The Config file should be formatted as, 
 ```json
 {
     "API_BASE": "<base url of your azure openai endpoint>",
