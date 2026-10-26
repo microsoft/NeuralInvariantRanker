@@ -2,7 +2,7 @@
 torch==1.13.1+cu116
 openai==1.4.0
 tiktoken
-nltk==3.8.1
+nltk==3.10.4
 transformers==4.36.0
 datasets==1.18.3
 numpy==1.22.0
